@@ -1,0 +1,98 @@
+> ## Data Science Examples Blog
+> ## http://datascienceexamples.com
+> ## 
+> ## Example R script
+> ## Using NFL 2016 Season Game Data
+> ## 
+> ## 1. Create R working directory 
+> ## 2. Get test files from Github (https://github.com/mndatascienceexamples/datascienceexamples)
+> ##    nfl_2016_games_allseason.txt
+> ##    R_First_Script.R
+> ##    (optional) R_First_Script_Results.txt
+> ## 3. Move test files into working directory
+> ## 4. Execute R_First_Script.R script or R commands individually
+> 
+> 
+> 
+> ## R Studio environment settings
+> 
+> ## Set working directory - using C:\\R on a Windows computer for this example.
+> setwd(("C:\\R"))
+> 
+> ## Show working directory
+> getwd()
+[1] "C:/R"
+> 
+> ## Load data from text file into R Data Frame (nflgame)
+> nflgames <- read.table("nfl_2016_games_allseason.txt", sep=",", header=TRUE, stringsAsFactors = TRUE)
+> 
+> ##  Show column names of nflgames R Data Frame
+> names(nflgames)
+ [1] "nflweek"      "gameDate"     "otyn"         "roadTeam"     "rtTotalScore" "rtScore1Q"    "rtScore2Q"    "rtScore3Q"    "rtScore4Q"    "rtScoreOT"   
+[11] "rtFirstDowns" "rt3DConv"     "rt3DAtt"      "rt4DConv"     "rt4DAtt"      "rtTYds"       "rtRushYds"    "rtPassYds"    "rtTO"         "rtSacks"     
+[21] "rtPen"        "rtPenYds"     "homeTeam"     "htTotalScore" "htScore1Q"    "htScore2Q"    "htScore3Q"    "htScore4Q"    "htScoreOT"    "htFirstDowns"
+[31] "ht3DConv"     "ht3DAtt"      "ht4DConv"     "ht4DAtt"      "htTYds"       "htRushYds"    "htPassYds"    "htTO"         "htSacks"      "htPen"       
+[41] "htPenYds"    
+> 
+> ## Minnesota Vikings Games
+> ## In one R command
+> mnGames <- subset(nflgames, (roadTeam == 'MIN' | homeTeam == 'MIN'))
+> 
+> ## Multiple R commands - separate data frames for home and road games, and a merged data frame
+> mnRoadGames <- subset(nflgames, (roadTeam == 'MIN'))
+> mnHomeGames <- subset(nflgames, (homeTeam == 'MIN'))
+> ##  merge road and home games data frames => use "all = T" parameter, which essentially performs an outer join on two frames
+> mnGames <- merge(mnRoadGames, mnHomeGames, all = T)
+> 
+> ## show number of observations for each data frame
+> nrow(mnRoadGames)
+[1] 8
+> nrow(mnHomeGames)
+[1] 8
+> nrow(mnGames)
+[1] 16
+> 
+> ## Road Record
+> mnRoadWins <- subset(mnRoadGames, mnRoadGames$rtTotalScore > mnRoadGames$htTotalScore)
+> mnRoadLosses <- subset(mnRoadGames, mnRoadGames$rtTotalScore < mnRoadGames$htTotalScore)
+> mnRoadTies <- subset(mnRoadGames, mnRoadGames$rtTotalScore == mnRoadGames$htTotalScore)
+> 
+> ## Display Results - Minnesota Vikings 2016 road games
+> cat('Minnesota Vikings 2016 Season Road Record: ', c(nrow(mnRoadWins),nrow(mnRoadLosses),nrow(mnRoadTies)))
+Minnesota Vikings 2016 Season Road Record:  3 5 0
+> 
+> 
+> 
+> ## Home Record
+> mnHomeWins <- subset(mnHomeGames, mnHomeGames$rtTotalScore < mnHomeGames$htTotalScore)
+> mnHomeLosses <- subset(mnHomeGames, mnHomeGames$rtTotalScore > mnHomeGames$htTotalScore)
+> mnHomeTies <- subset(mnHomeGames, mnHomeGames$rtTotalScore == mnHomeGames$htTotalScore)
+> 
+> ## Display Results - Minnesota Vikings 2016 home games
+> cat('Minnesota Vikings 2016 Season Home Record: ', c(nrow(mnHomeWins),nrow(mnHomeLosses),nrow(mnHomeTies)))
+Minnesota Vikings 2016 Season Home Record:  5 3 0
+> 
+> 
+> 
+> ## Combined Minnesota Vikings 2016 Home and Road Records
+> mnWins <- subset(nflgames, (
++   ((nflgames$htTotalScore > nflgames$rtTotalScore) & nflgames$homeTeam == "MIN")
++   | ((nflgames$rtTotalScore > nflgames$htTotalScore) & nflgames$roadTeam == "MIN")
++ ))
+> 
+> 
+> mnLosses <- subset(nflgames, (
++   ((nflgames$htTotalScore < nflgames$rtTotalScore) & nflgames$homeTeam == "MIN")
++   | ((nflgames$rtTotalScore < nflgames$htTotalScore) & nflgames$roadTeam == "MIN")
++ ))
+> 
+> 
+> mnTies <- subset(nflgames, (
++   (nflgames$homeTeam == "MIN" & nflgames$htTotalScore == nflgames$rtTotalGoals)
++   | (nflgames$roadTeam == "MIN" & nflgames$rtTotalScore == nflgames$htTotalScore)
++ ))
+> 
+> ## Display Results - All Minnesota Vikings 2016 games
+> cat('Minnesota Vikings 2016 Season Record: ', c(nrow(mnWins),nrow(mnLosses),nrow(mnTies)))
+Minnesota Vikings 2016 Season Record:  8 8 0
+> 
